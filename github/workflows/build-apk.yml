@@ -1,4 +1,5 @@
 
+
 name: Build CYBER WIFI APK
 
 on:
@@ -32,6 +33,24 @@ jobs:
 
       - name: Create Flutter Android Project
         run: flutter create --platforms=android --org com.cyberwifi .
+
+      - name: Add WiFi Permissions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          permissions = """
+              <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+              <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+              <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"/>
+          """
+          s = s.replace("    <application", permissions + "\n    <application", 1)
+          s = s.replace('android:label="flutter_app"', 'android:label="CYBER WIFI"')
+          p.write_text(s)
+          PY
 
       - name: Get Dependencies
         run: flutter pub get
